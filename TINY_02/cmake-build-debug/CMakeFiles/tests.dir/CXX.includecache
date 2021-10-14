@@ -1,0 +1,30 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/japaw/Codes/B6B36PJC/TINY_02/tiny-02.cpp
+tiny-02.hpp
+/home/japaw/Codes/B6B36PJC/TINY_02/tiny-02.hpp
+set
+-
+regex
+-
+exception
+-
+tuple
+-
+sstream
+-
+iostream
+-
+
+/home/japaw/Codes/B6B36PJC/TINY_02/tiny-02.hpp
+vector
+-
+string
+-
+
