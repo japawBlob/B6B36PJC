@@ -1,0 +1,1 @@
+/usr/bin/c++ -g CMakeFiles/tests.dir/tiny-03.cpp.o CMakeFiles/tests.dir/tests-tiny-03.cpp.o CMakeFiles/tests.dir/tests-main.cpp.o -o tests 

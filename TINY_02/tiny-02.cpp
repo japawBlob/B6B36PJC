@@ -9,6 +9,7 @@
 
 std::pair<size_t, int*> parse_line(std::string const& line) {
     std::stringstream sstr(line);
+    //std::cout << line << "\n";
     size_t line_size;
     sstr >> line_size;
     int* data = new int[line_size];
@@ -45,7 +46,10 @@ std::vector<statistics> summarize_data(std::istream& in) {
             auto median = (num_data % 2 == 1)? data[num_data/2] : (data[(num_data - 1) /2] + data[num_data/2]) / 2;
             summary.push_back({num_data, data[0], data[num_data-1], median});
         }
-        delete data;
+        /*for (int i = 0; i < num_data; ++i) {
+            std::cout << data[i] << " ";
+        } std::cout << std::endl;*/
+        delete[] data;
     }
     
     return summary;
