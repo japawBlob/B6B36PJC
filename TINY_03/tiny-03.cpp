@@ -5,7 +5,6 @@
 #include <sstream>
 #include <algorithm>
 
-
 class fixed_array {
     int* m_data = nullptr;
     size_t m_size = 0;
