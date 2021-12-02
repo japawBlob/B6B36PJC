@@ -5,6 +5,9 @@
 #include <cassert>
 #include <iostream>
 
+/**
+ * Základní konstruktor
+ */
 trie::trie() = default;
 trie::trie(const std::vector<std::string>& strings){
     m_root = new trie_node;
@@ -111,7 +114,7 @@ bool trie::empty() const {
     return false;
 }
 
-/// STAGE 1 COMPLETE
+///****************************///****************************///****************************///****************************
 
 trie::const_iterator::const_iterator(const trie_node* node){
     this->current_node = node;
@@ -133,7 +136,6 @@ trie::const_iterator trie::begin() const {
 trie::const_iterator trie::end() const {
     return trie::const_iterator(nullptr);
 }
-
 
 trie::const_iterator& trie::const_iterator::operator++() {
     if(this->current_node == nullptr){
@@ -186,6 +188,10 @@ trie::const_iterator& trie::const_iterator::operator++() {
     this->current_node = ret;
     return *this;
 }
+
+/**
+ * Posune iterátor na abecedně následující řetězec v trie
+ */
 trie::const_iterator trie::const_iterator::operator++(int){
     trie::const_iterator temp = *this;
     ++(*this);
@@ -205,6 +211,7 @@ trie::const_iterator::reference trie::const_iterator::operator*() const {
     }
     return returnString;
 }
+
 bool trie::const_iterator::operator==(const const_iterator& rhs) const {
     return this->current_node == rhs.current_node;
 }
@@ -212,168 +219,267 @@ bool trie::const_iterator::operator!=(const const_iterator& rhs) const{
     return this->current_node != rhs.current_node;
 }
 
-/// STAGE 2 complete
 
-trie::trie(trie const& original){
+///*********************************************************************************************************************
+
+
+/**
+
+ * Operátor výpisu do proudu.
+ *
+ * Tuto funkci netestujeme, ale pokud ji vhodně implementujete, budete mít
+ * ve výstupech z testů užitěčně vypsaný obsah trie.
+ */
+std::ostream& operator<<(std::ostream& out, trie const& trie)
+{
+    //std::cout << "";
+    return out;
+}
+
+
+/**
+ * Prohodí všechny prvky mezi touto trií a `rhs`.
+ */
+void trie::swap(trie& rhs) {
+    trie_node *rootyTooty = rhs.m_root;
+    rhs.m_root = m_root;
+    m_root = rootyTooty;
+
+    int temSize = rhs.m_size;
+    rhs.m_size = m_size;
+    m_size = temSize;
+}
+
+/**
+ * ADL customization point pro std::swap.
+ * Výsledek `swap(lhs, rhs);` by měl být ekvivalentní s výsledkem
+ * `lhs.swap(rhs);`
+ */
+void swap(trie& lhs, trie& rhs) {
+    lhs.swap(rhs);
+}
+
+/**
+ * Zkopíruje všechny řetězce z rhs do dané trie (this)
+ */
+trie::trie(const trie& rhs) {
     m_root = new trie_node();
-    const_iterator iterator = original.begin();
-    while(iterator != original.end()){
-        insert(*iterator++);
+    for (const_iterator itr = rhs.begin(); itr != rhs.end(); itr++) {
+        insert(*itr);
     }
 }
-trie& trie::operator=(trie const& original){
-    trie blob(original);
-    this->swap (blob);
+
+/**
+ * Zkopíruje všechny řetězce z rhs do dané trie (this), tak aby zmizeli včechny řetězce co byli v původní trii (this)
+ */
+trie& trie::operator=(const trie& rhs) {
+    trie new_trie(rhs);
+    swap(new_trie);
     return *this;
 }
+
+/**
+ * Přesune všechny řetězce z rhs do dané trie (this)
+ */
 trie::trie(trie&& rhs) {
     swap(rhs);
 }
-trie& trie::operator=(trie&& rhs){
+
+/**
+ * Přesune všechny řetězce z rhs do dané trie (this)
+ */
+trie& trie::operator=(trie&& rhs) {
     swap(rhs);
     return *this;
 }
-void trie::swap(trie& rhs){
-    trie_node* temp = rhs.m_root;
-    rhs.m_root = m_root;
-    m_root = temp;
 
-    int blob = rhs.m_size;
-    rhs.m_size = m_size;
-    m_size = blob;
-}
-bool trie::operator<(const trie& rhs) const{
-    /*if(rhs.m_size > m_size){
-        return true;
-    }*/
-
-    const_iterator iteratorThis = this->begin();
-    const_iterator iteratorRhs = rhs.begin();
-    while(iteratorThis != this->end()){
-        if (*iteratorThis > *iteratorRhs){
-            return false;
-        }
-        if (*iteratorThis < *iteratorRhs){
-            return true;
-        }
-        iteratorThis++;
-        iteratorRhs++;
-    }
-    if(rhs.m_size > m_size){
-        return true;
-    }
-    return false;
-}
+/**
+ * Vrací `true` pokud je trie `rhs` roven této.
+ */
 bool trie::operator==(const trie& rhs) const {
-    if(this->m_size != rhs.m_size){
+    if (m_size != rhs.m_size)
+    {
         return false;
     }
-    const_iterator iteratorThis = this->begin();
-    const_iterator iteratorRhs = this->begin();
-    while(iteratorThis != this->end()){
-        if (iteratorThis++ != iteratorRhs++){
+
+    const_iterator itr2 = begin();
+    for (const_iterator itr = rhs.begin(); itr != rhs.end(); itr++) {
+        if(*itr != *itr2){
             return false;
         }
+        itr2++;
     }
     return true;
 }
-bool operator!=(const trie& lhs, const trie& rhs){
-    return !(lhs==rhs);
-}
-bool operator<=(const trie& lhs, const trie& rhs){
-    return (lhs < rhs) || (lhs == rhs);
-}
-bool operator>(const trie& lhs, const trie& rhs){
-    return !(lhs<=rhs);
-}
-bool operator>=(const trie& lhs, const trie& rhs){
-    return (lhs > rhs) || (lhs == rhs);
 
-}
-std::ostream& operator<<(std::ostream& out, trie const& trie){
-    out << "blobus";
-    return out;
-}
-/// SEction 3 complete
+/**
+ * Vrací `true` pokud je tato trie menší než `rhs`.
+ */
+bool trie::operator<(const trie& rhs) const {
+    for (const_iterator itr = rhs.begin(), itr2 = begin(); itr != rhs.end() && itr2 != end(); itr++, itr2++) {
+        if(*itr > *itr2){
+            return true;
+        } else if (*itr < *itr2){
+            return false;
+        }
+    }
 
+    if(rhs.m_size > m_size){
+        return true;
+    }
+
+    return false;
+}
+
+/**
+ * 2 trie jsou si nerovné právě tehdy, když si nejsou rovné (viz operator==)
+ */
+bool operator!=(const trie& lhs, const trie& rhs) {
+    return !(lhs == rhs);
+}
+
+/**
+ * Lexicografické uspořádání, viz operator<
+ */
+bool operator<=(const trie& lhs, const trie& rhs) {
+    return lhs == rhs || lhs < rhs;
+}
+
+/**
+ * Lexicografické uspořádání, viz operator<
+ */
+bool operator>(const trie& lhs, const trie& rhs) {
+    return !(lhs <= rhs);
+}
+
+/**
+ * Lexicografické uspořádání, viz operator<
+ */
+bool operator>=(const trie& lhs, const trie& rhs) {
+    return lhs == rhs || lhs > rhs;
+}
+
+
+/**
+ * Vrátí všechny prvky trie, které začínají daným prefixem.
+ */
 std::vector<std::string> trie::search_by_prefix(const std::string& prefix) const {
-    std::vector<std::string> ret;
+    std::vector<std::string> res;
+    if(m_root == nullptr){
+        return res;
+    }
+    const_iterator itr = begin();
+    while(*itr < prefix){
+        itr++;
+        if (itr == end())
+        {
+            return res;
+        }
+    }
+    while((*itr).find(prefix) == 0)
+    {
+        res.push_back(*itr);
+        itr++;
+        if (itr == end())
+        {
+            return res;
+        }
+    }
 
-    return ret;
+    return res;
 }
 
+/**
+ * Vrátí všechny řetězce z trie, jež jsou prefixem daného řetězce.
+ */
 std::vector<std::string> trie::get_prefixes(const std::string& str) const {
-    std::vector<std::string> ret;
-    trie_node* currentNode = this->m_root;
-    if(currentNode == nullptr){
-        return ret;
+    std::vector<std::string> res;
+    if(m_root == nullptr){
+        return res;
+    } else if (m_root->is_terminal)
+    {
+        res.push_back("");
     }
-    if(currentNode->is_terminal){
-        ret.emplace_back("");
-    }
-    for (char c : str) {
-        if(currentNode->children[c] != nullptr){
-            if(currentNode->children[c]->is_terminal){
-                const_iterator itr(currentNode->children[c]);
-                ret.push_back(*itr);
+    trie_node* tempParent = m_root;
+
+    for (int i = 0; i < str.size(); ++i)
+    {
+        if (tempParent->children[str[i]] != nullptr)
+        {
+            tempParent = tempParent->children[str[i]];
+            if (tempParent->is_terminal)
+            {
+                const_iterator itr(tempParent);
+                res.push_back(*itr);
             }
-            currentNode = currentNode->children[c];
-        } else {
-            break;
+        } else{
+            return res;
         }
     }
-    return ret;
+    return res;
 }
 
+/**
+ * Vrátí novou trii, která obsahuje průnik této a `rhs`
+ */
 trie trie::operator&(trie const& rhs) const {
-    trie ret;
-    const_iterator iterator = this->begin();
-    while(iterator != this->end()){
-        if (rhs.contains(*iterator) && this->contains(*iterator)){
-            ret.insert(*iterator);
+    trie res;
+    for (const_iterator itr = this->begin(); itr != this->end(); itr++) {
+        if(rhs.contains(*itr) && this->contains(*itr)){
+            res.insert(*itr);
         }
-        iterator++;
     }
-    return ret;
+
+    return res;
 }
 
+/**
+ * Vrátí novou trii, která obsahuje sjednocení této a `rhs`
+ */
 trie trie::operator|(trie const& rhs) const {
-    trie ret;
-
-    /*const_iterator iteratorThis = this->begin();
-    const_iterator iteratorRhs = rhs.begin();
-    while( iteratorThis != this->end() || iteratorRhs != rhs.end() ){
-        if(*iteratorRhs == *iteratorThis){
-            ret.insert(*iteratorThis);
-        } else {
-            ret.insert(*iteratorThis);
-            ret.insert(*iteratorRhs);
-        }
-        iteratorThis++;
-        iteratorRhs++;
-    }
-    if(iteratorThis == this->end()){
-        while(iteratorRhs != rhs.end()){
-            ret.insert(*iteratorRhs);
-            iteratorRhs++;
-        }
-    } else if(iteratorRhs == rhs.end()){
-        while(iteratorThis != this->end()){
-            ret.insert(*iteratorThis);
-            iteratorThis++;
-        }
-    }*/
-    const_iterator iteratorThis = this->begin();
-    const_iterator iteratorRhs = rhs.begin();
-
-    while (iteratorThis != this->end()){
-        ret.insert(*iteratorThis);
-        iteratorThis++;
-    }
-    while (iteratorRhs != rhs.end()){
-        ret.insert(*iteratorRhs);
-        iteratorRhs++;
+    trie res;
+    for (const_iterator itr = this->begin(); itr != this->end(); itr++) {
+        res.insert(*itr);
     }
 
-    return ret;
+    for (const_iterator itr = rhs.begin(); itr != rhs.end(); itr++) {
+        res.insert(*itr);
+    }
+    return res;
 }
+
+
+/*int main()
+{
+	trie trie({ "abcd"});
+	if (trie.contains("abcd"))
+	{
+		std::cout << "abcd je in \n";
+	}
+	if (!trie.contains(""))
+	{
+		std::cout << "  neni in \n";
+	}
+	if (!trie.contains("a"))
+	{
+		std::cout << " a neni in \n";
+	}
+	if (!trie.contains("ab"))
+	{
+		std::cout << " ab neni in \n";
+	}
+	if (!trie.contains("abc"))
+	{
+		std::cout << " abc neni in \n";
+	}
+	trie.insert("abc");
+	if (trie.contains("abc"))
+	{
+		std::cout << "abc je in \n";
+	}
+
+
+
+
+
+}*/
